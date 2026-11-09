@@ -23,6 +23,7 @@ import {
   Check,
   Sparkles,
   Zap,
+  Lock,
   ExternalLink,
   X,
 } from "lucide-react";
@@ -55,6 +56,7 @@ interface NavItem {
   href: string;
   icon: React.ElementType;
   badge?: string;
+  locked?: boolean;
 }
 
 interface NavGroup {
@@ -70,7 +72,7 @@ const NAV_GROUPS: NavGroup[] = [
       { label: "Quick Start", href: "/quick-start", icon: Zap, badge: "Templates" },
       { label: "AI Agents", href: "/agents", icon: Bot },
       { label: "Workflows", href: "/workflows", icon: GitBranch, badge: "Visual" },
-      { label: "Knowledge Base", href: "/knowledge-base", icon: BookOpen },
+      { label: "Knowledge Base", href: "/knowledge-base", icon: BookOpen, locked: true },
     ],
   },
   {
@@ -84,7 +86,7 @@ const NAV_GROUPS: NavGroup[] = [
   {
     group: "MANAGEMENT",
     items: [
-      { label: "Integrations", href: "/integrations", icon: Blocks },
+      { label: "Integrations", href: "/integrations", icon: Blocks, locked: true },
       { label: "Analytics", href: "/analytics", icon: BarChart3 },
     ],
   },
@@ -199,6 +201,45 @@ export function Sidebar() {
             {section.items.map((item) => {
               const Icon = item.icon;
               const active = isRouteActive(item.href);
+
+              if (item.locked) {
+                return (
+                  <button
+                    key={item.href}
+                    type="button"
+                    onClick={() => {
+                      toast.info(
+                        `${item.label} is scheduled for an upcoming platform release. Stay tuned!`,
+                        {
+                          description:
+                            "Our engineering team is actively building this module for high-scale enterprise deployments.",
+                          icon: <Lock className="h-4 w-4 text-[#8B7CFF]" />,
+                        }
+                      );
+                    }}
+                    title={collapsed ? `${item.label} (Coming Soon)` : undefined}
+                    className={cn(
+                      "group relative flex w-full items-center gap-3 rounded-xl px-2.5 py-2 text-xs font-medium transition-all duration-150 cursor-pointer opacity-75 hover:opacity-100",
+                      collapsed && "justify-center px-0 py-2.5",
+                      "text-[#777E90] hover:bg-[#1C1F28]/60 hover:text-[#A3A9B8]"
+                    )}
+                  >
+                    <Icon className="h-4 w-4 shrink-0 text-[#555C6E] transition-colors group-hover:text-[#8B7CFF]" />
+                    {!collapsed && (
+                      <span className="flex-1 text-left truncate text-[#8A92A6]">
+                        {item.label}
+                      </span>
+                    )}
+                    {!collapsed && (
+                      <span className="flex items-center gap-1 rounded-full border border-[#2B303C] bg-[#171A21] px-1.5 py-0.5 text-[9px] font-semibold text-[#8B7CFF]">
+                        <Lock className="h-2.5 w-2.5" />
+                        Soon
+                      </span>
+                    )}
+                  </button>
+                );
+              }
+
               return (
                 <Link
                   key={item.href}

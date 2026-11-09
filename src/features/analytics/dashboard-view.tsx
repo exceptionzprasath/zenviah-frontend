@@ -598,15 +598,15 @@ export function DashboardView() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-3">
               <div>
-                <CardTitle>Recent Agents & Integrations</CardTitle>
-                <CardDescription>Connected telephony & AI gateways</CardDescription>
+                <CardTitle>Recent AI Agents</CardTitle>
+                <CardDescription>Active voice agents & assigned DIDs</CardDescription>
               </div>
               <Button variant="ghost" size="sm" asChild>
-                <Link href="/integrations">Marketplace</Link>
+                <Link href="/agents">View All</Link>
               </Button>
             </CardHeader>
             <CardContent className="space-y-2.5">
-              {agents.slice(0, 2).map((ag) => (
+              {agents.slice(0, 3).map((ag) => (
                 <div
                   key={ag.id}
                   onClick={() => router.push(`/agents/${ag.id}`)}
@@ -626,22 +626,6 @@ export function DashboardView() {
                   <Badge variant="success">{ag.status}</Badge>
                 </div>
               ))}
-
-              <div className="flex flex-wrap gap-2 pt-1">
-                {integrations
-                  .filter((i) => i.status === "Connected")
-                  .slice(0, 5)
-                  .map((int) => (
-                    <span
-                      key={int.id}
-                      onClick={() => router.push("/integrations")}
-                      className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-[#E8EAF0] bg-[#F8F9FC] px-2.5 py-1 text-[11px] font-medium text-[#171923] hover:border-[#635BFF]"
-                    >
-                      <Blocks className="h-3 w-3 text-[#16A36A]" />
-                      {int.name}
-                    </span>
-                  ))}
-              </div>
             </CardContent>
           </Card>
         </div>
