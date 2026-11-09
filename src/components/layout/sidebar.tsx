@@ -22,6 +22,7 @@ import {
   ChevronsUpDown,
   Check,
   Sparkles,
+  Zap,
   ExternalLink,
   X,
 } from "lucide-react";
@@ -66,6 +67,7 @@ const NAV_GROUPS: NavGroup[] = [
     group: "MAIN",
     items: [
       { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
+      { label: "Quick Start", href: "/quick-start", icon: Zap, badge: "Templates" },
       { label: "AI Agents", href: "/agents", icon: Bot },
       { label: "Workflows", href: "/workflows", icon: GitBranch, badge: "Visual" },
       { label: "Knowledge Base", href: "/knowledge-base", icon: BookOpen },

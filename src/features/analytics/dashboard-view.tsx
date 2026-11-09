@@ -20,6 +20,7 @@ import {
   PhoneOutgoing,
   Blocks,
   Activity,
+  Zap,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -164,6 +165,15 @@ export function DashboardView() {
               </button>
             ))}
           </div>
+
+          <Button
+            variant="outline"
+            size="default"
+            onClick={() => router.push("/quick-start")}
+          >
+            <Zap className="h-4 w-4 text-[#635BFF]" />
+            <span>Quick Start</span>
+          </Button>
 
           <Button
             variant="outline"

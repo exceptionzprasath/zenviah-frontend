@@ -5,6 +5,7 @@ import { ZenviahLogo } from "@/components/shared/zenviah-logo";
 import { formatINR, formatDuration, formatPhoneIN } from "@/lib/utils";
 import { useAppStore } from "@/stores/use-app-store";
 import { BRAND_CONFIG, SUPPORTED_LANGUAGES } from "@/config/constants";
+import { QUICK_START_TEMPLATES } from "@/config/quick-start-templates";
 
 describe("Zenviah.ai Brand & Core Platform Verification", () => {
   it("enforces official Zenviah.ai branding and tagline", () => {
@@ -50,6 +51,22 @@ describe("Zenviah.ai Brand & Core Platform Verification", () => {
       .getState()
       .createApiKey("Test Suite Key", "Staging");
     expect(newKey.maskedKey).toContain("••••");
+  });
+
+  it("provides comprehensive Quick Start AI templates for rapid deployment", () => {
+    const templateNames = QUICK_START_TEMPLATES.map((t) => t.name);
+    expect(templateNames).toContain("Appointment Booking AI");
+    expect(templateNames).toContain("Feedback AI");
+    expect(templateNames).toContain("Marketing AI");
+    expect(templateNames).toContain("Followup AI");
+    expect(templateNames).toContain("Custom Config");
+
+    QUICK_START_TEMPLATES.forEach((tmpl) => {
+      expect(tmpl.greetingMessage.length).toBeGreaterThan(10);
+      expect(tmpl.systemPrompt.length).toBeGreaterThan(20);
+      expect(tmpl.keyHighlights.length).toBeGreaterThanOrEqual(3);
+      expect(tmpl.workflowSteps.length).toBeGreaterThanOrEqual(3);
+    });
   });
 });
 

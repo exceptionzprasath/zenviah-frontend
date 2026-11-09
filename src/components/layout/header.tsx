@@ -18,6 +18,7 @@ import {
   KeyRound,
   User,
   Sparkles,
+  Zap,
   CheckCheck,
 } from "lucide-react";
 import { useAppStore } from "@/stores/use-app-store";
@@ -43,6 +44,7 @@ import { toast } from "sonner";
 
 const ROUTE_LABELS: Record<string, string> = {
   dashboard: "Overview",
+  "quick-start": "Quick Start",
   agents: "AI Agents",
   new: "Create Agent Wizard",
   workflows: "Visual Workflow Builder",
@@ -434,6 +436,7 @@ export function Header() {
               </p>
               <div className="grid grid-cols-2 gap-1.5">
                 {[
+                  { label: "Quick Start AI Templates", href: "/quick-start", icon: Zap },
                   { label: "Create AI Agent Wizard", href: "/agents/new", icon: Bot },
                   { label: "Open Visual Workflow Builder", href: "/workflows", icon: GitBranch },
                   { label: "Manage +91 Phone Numbers", href: "/phone-numbers", icon: PhoneCall },
