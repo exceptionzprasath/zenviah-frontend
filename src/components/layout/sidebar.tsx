@@ -19,7 +19,6 @@ import {
   LifeBuoy,
   ChevronLeft,
   ChevronRight,
-  ChevronsUpDown,
   Check,
   Sparkles,
   Zap,
@@ -107,9 +106,6 @@ export function Sidebar() {
     toggleSidebar,
     isMobileNavOpen,
     setMobileNavOpen,
-    workspaces,
-    activeWorkspaceId,
-    setActiveWorkspace,
     user,
   } = useAppStore();
 
@@ -117,9 +113,6 @@ export function Sidebar() {
   const [supportOpen, setSupportOpen] = useState(false);
   const [supportSubject, setSupportSubject] = useState("");
   const [supportMessage, setSupportMessage] = useState("");
-
-  const activeWorkspace =
-    workspaces.find((w) => w.id === activeWorkspaceId) || workspaces[0];
 
   const isRouteActive = (href: string) => {
     if (href === "/dashboard") return pathname === "/dashboard" || pathname === "/";
@@ -314,74 +307,22 @@ export function Sidebar() {
           </button>
         </div>
 
-        {/* Workspace Selector Dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button
-              type="button"
-              className={cn(
-                "flex w-full items-center justify-between rounded-xl border border-[#222631] bg-[#171A21] p-2 text-left transition-colors hover:border-[#323846]",
-                collapsed && "justify-center p-2"
-              )}
-              title="Switch Workspace"
-            >
-              <div className="flex items-center gap-2.5 overflow-hidden">
-                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#635BFF]/20 text-xs font-bold text-[#8B7CFF]">
-                  {activeWorkspace.name.slice(0, 2).toUpperCase()}
-                </div>
-                {!collapsed && (
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-xs font-semibold text-white">
-                      {activeWorkspace.name}
-                    </p>
-                    <p className="truncate text-[10px] text-[#777E90]">
-                      {activeWorkspace.plan} Plan • {activeWorkspace.role}
-                    </p>
-                  </div>
-                )}
-              </div>
-              {!collapsed && (
-                <ChevronsUpDown className="h-3.5 w-3.5 shrink-0 text-[#777E90]" />
-              )}
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-64">
-            <DropdownMenuLabel>Switch Multi-Tenant Workspace</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            {workspaces.map((ws) => (
-              <DropdownMenuItem
-                key={ws.id}
-                onClick={() => {
-                  setActiveWorkspace(ws.id);
-                  toast.success(`Switched active workspace to ${ws.name}`);
-                }}
-                className="flex items-center justify-between py-2"
-              >
-                <div>
-                  <p className="text-xs font-semibold text-[#171923]">{ws.name}</p>
-                  <p className="text-[11px] text-[#777E90]">
-                    {ws.plan} • {ws.minutesUsed.toLocaleString("en-IN")} /{" "}
-                    {ws.minutesLimit.toLocaleString("en-IN")} mins
-                  </p>
-                </div>
-                {ws.id === activeWorkspace.id && (
-                  <Check className="h-4 w-4 text-[#635BFF]" />
-                )}
-              </DropdownMenuItem>
-            ))}
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() => router.push("/settings")}
-              className="text-xs text-[#635BFF]"
-            >
-              <Sparkles className="h-3.5 w-3.5" />
-              Manage Workspaces & Teams
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
         {/* User Profile summary */}
-        {!collapsed && (
+        {collapsed ? (
+          <div className="flex justify-center py-1">
+            <Link
+              href="/settings"
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-tr from-[#635BFF] to-[#8B7CFF] text-[11px] font-semibold text-white transition-opacity hover:opacity-90"
+              title={`${user.name} (${user.email})`}
+            >
+              {user.name
+                .split(" ")
+                .map((n) => n[0])
+                .join("")
+                .slice(0, 2)}
+            </Link>
+          </div>
+        ) : (
           <div className="flex items-center justify-between rounded-xl px-2 py-1.5">
             <div className="flex items-center gap-2.5 overflow-hidden">
               <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-tr from-[#635BFF] to-[#8B7CFF] text-[11px] font-semibold text-white">
