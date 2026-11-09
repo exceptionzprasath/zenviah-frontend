@@ -5,21 +5,58 @@ import {
   SupportedLanguage,
   VoiceProvider,
 } from "@/types";
-import {
-  CalendarCheck,
-  MessageSquareHeart,
-  Megaphone,
-  PhoneForwarded,
-  SlidersHorizontal,
-} from "lucide-react";
+
+export type TemplateTypeKey =
+  | "appointment-booking"
+  | "feedback-ai"
+  | "marketing-ai"
+  | "followup-ai"
+  | "custom-config";
+
+export interface TemplateSpecificConfig {
+  requiresContactsUpload: boolean;
+  contactsUploadDescription?: string;
+  sampleContactsFile?: string;
+  defaultContactCount?: number;
+  // Specific settings tags & labels
+  specificSettingsTitle: string;
+  specificSettingsDescription: string;
+  // Dynamic fields specific to this template
+  specificField1Label?: string;
+  specificField1Placeholder?: string;
+  specificField1Default?: string;
+  specificField1Type?: "text" | "select" | "number";
+  specificField1Options?: string[];
+  
+  specificField2Label?: string;
+  specificField2Placeholder?: string;
+  specificField2Default?: string;
+  specificField2Type?: "text" | "select" | "number";
+  specificField2Options?: string[];
+
+  specificToggleLabel?: string;
+  specificToggleDescription?: string;
+  specificToggleDefault?: boolean;
+}
 
 export interface QuickStartTemplate {
   id: string;
+  typeKey: TemplateTypeKey;
   name: string;
-  category: "Appointment Booking" | "Feedback & CSAT" | "Marketing & Outreach" | "Nurturing & Follow-up" | "Custom Engineering";
+  category:
+    | "Appointment Booking"
+    | "Feedback & CSAT"
+    | "Marketing & Outreach"
+    | "Nurturing & Follow-up"
+    | "Custom Engineering";
   tagline: string;
   description: string;
-  iconName: "CalendarCheck" | "MessageSquareHeart" | "Megaphone" | "PhoneForwarded" | "SlidersHorizontal";
+  iconName:
+    | "CalendarCheck"
+    | "MessageSquareHeart"
+    | "Megaphone"
+    | "PhoneForwarded"
+    | "SlidersHorizontal";
   accentColor: string;
   badge: string;
   badgeVariant: "default" | "success" | "warning" | "secondary" | "dark";
@@ -50,24 +87,27 @@ export interface QuickStartTemplate {
   workflowSteps: string[];
   estimatedSetupMinutes: number;
   connectedIntegrations: string[];
+  // Template-Specific tailored configuration
+  specificConfig: TemplateSpecificConfig;
 }
 
 export const QUICK_START_TEMPLATES: QuickStartTemplate[] = [
   {
     id: "template-appointment-booking",
+    typeKey: "appointment-booking",
     name: "Appointment Booking AI",
     category: "Appointment Booking",
     tagline: "Automated slot discovery, calendar sync & instant confirmation",
     description:
-      "Conversational voice agent designed for healthcare clinics, B2B sales teams, diagnostic labs, and service centers to book, reschedule, or cancel appointments in seconds.",
+      "Inbound & on-demand conversational voice agent designed for healthcare clinics, B2B sales teams, salons, and diagnostic labs to check slot availability and book directly into calendars.",
     iconName: "CalendarCheck",
     accentColor: "#635BFF",
-    badge: "Most Popular",
+    badge: "Calendar Sync",
     badgeVariant: "default",
     targetAudience: "Clinics, Hospitals, Salons, B2B Sales & Service Centers",
-    recommendedFor: "High-volume appointment scheduling with calendar conflict prevention and instant WhatsApp / SMS confirmations.",
+    recommendedFor: "High-volume inbound appointment requests with two-way calendar conflict detection and instant WhatsApp / SMS confirmations.",
     defaultDirection: "Inbound",
-    businessUseCase: "24/7 Automated Slot Scheduling & Calendar Synchronization",
+    businessUseCase: "24/7 Inbound Slot Scheduling & Calendar Synchronization",
     llmProvider: "Google Gemini",
     model: "gemini-2.0-flash",
     temperature: 0.3,
@@ -96,29 +136,46 @@ Maintain an empathetic, patient, and reassuring healthcare tone.`,
     sampleAudioQuote:
       "Hello! I've reserved your dental consultation slot for tomorrow at 10:30 AM. You will receive an SMS confirmation link momentarily.",
     keyHighlights: [
-      "Two-way sync with Google Calendar, Outlook 365 & HubSpot",
+      "Inbound focused: No bulk contact list upload needed",
+      "Two-way live sync with Google Calendar, Outlook 365 & Cal.com",
       "Dynamic date-time parsing in 8 Indian languages + English",
-      "Real-time conflict detection & instant reschedule options",
-      "Instant SMS & WhatsApp confirmation webhook trigger",
+      "Instant SMS & WhatsApp confirmation link dispatch",
     ],
     extractedFields: ["department", "preferred_date", "preferred_time", "patient_phone"],
-    workflowSteps: ["Inbound Call", "Greet & Department Intent", "Calendar Availability API", "Confirm Slot", "Dispatch WhatsApp/SMS Confirmation"],
+    workflowSteps: ["Inbound Call", "Department & Doctor Intent", "Calendar Availability API", "Confirm Slot", "Dispatch WhatsApp/SMS Confirmation"],
     estimatedSetupMinutes: 1,
     connectedIntegrations: ["int-exotel", "int-hubspot", "int-sheets"],
+    specificConfig: {
+      requiresContactsUpload: false,
+      specificSettingsTitle: "Calendar & Clinic Scheduling Rules",
+      specificSettingsDescription: "Configure your live calendar connection and default consultation buffers.",
+      specificField1Label: "Calendar Integration Provider",
+      specificField1Type: "select",
+      specificField1Default: "Google Calendar",
+      specificField1Options: ["Google Calendar", "Outlook 365", "Cal.com", "HubSpot Meetings", "Custom Webhook API"],
+      specificField2Label: "Default Consultation Slot Duration",
+      specificField2Type: "select",
+      specificField2Default: "30 Minutes",
+      specificField2Options: ["15 Minutes", "30 Minutes", "45 Minutes", "60 Minutes"],
+      specificToggleLabel: "Auto-Send WhatsApp & SMS Confirmation Link",
+      specificToggleDescription: "Immediately trigger an automated SMS/WhatsApp booking receipt upon verbal confirmation.",
+      specificToggleDefault: true,
+    },
   },
   {
     id: "template-feedback-ai",
+    typeKey: "feedback-ai",
     name: "Feedback AI",
     category: "Feedback & CSAT",
     tagline: "Automated post-purchase & post-service CSAT voice surveys",
     description:
-      "High-response voice agent that conducts 45-second CSAT and NPS surveys after deliveries or service completions, capturing structured ratings and verbatim reasons.",
+      "Outbound voice agent that calls customer cohorts post-delivery or post-service to capture structured 1-5 star ratings, speech NPS, and verbatim pain points with instant escalation.",
     iconName: "MessageSquareHeart",
     accentColor: "#16A36A",
-    badge: "High Response",
+    badge: "Contact Upload Ready",
     badgeVariant: "success",
     targetAudience: "E-Commerce, Hospitality, Food Delivery, Telecom & Field Service",
-    recommendedFor: "Capturing 1-5 star ratings via speech or DTMF keypad, identifying dissatisfied customers, and escalating low ratings in real time.",
+    recommendedFor: "Conducting automated outbound CSAT surveys with CSV/Excel contact uploads, capturing keypad/voice ratings, and escalating low ratings.",
     defaultDirection: "Outbound",
     businessUseCase: "Post-Delivery Customer Satisfaction (CSAT) & Instant Escalation",
     llmProvider: "OpenAI",
@@ -146,29 +203,49 @@ Always keep calls under 90 seconds.`,
     sampleAudioQuote:
       "Thank you for the 5-star rating! We are thrilled your package arrived safely. Have a wonderful day ahead!",
     keyHighlights: [
+      "Bulk CSV / Excel customer contact list upload supported",
       "Captures ratings via voice speech recognition + DTMF keypad digits",
       "Automatic real-time ticket escalation for ratings ≤ 2",
-      "Sentiment analysis & verbatim keyword tagging",
-      "Automated export to Google Sheets, Zendesk & CRM",
+      "Instant sync to Google Sheets, Zendesk & CRM pipelines",
     ],
     extractedFields: ["csat_rating", "feedback_category", "sentiment", "escalation_flag"],
-    workflowSteps: ["Outbound Call", "Rate 1-5 Request", "Capture Voice / Keypad", "Sentiment Analysis", "Log Score & Escalate"],
+    workflowSteps: ["Upload Contact Cohort", "Outbound Survey Call", "Rate 1-5 Request", "Sentiment Analysis", "Log Score & Escalate"],
     estimatedSetupMinutes: 1,
     connectedIntegrations: ["int-exotel", "int-sheets", "int-n8n"],
+    specificConfig: {
+      requiresContactsUpload: true,
+      contactsUploadDescription: "Upload a CSV/Excel file containing customer numbers, recent order IDs, and purchase dates for outbound surveying.",
+      sampleContactsFile: "csat_customers_sample.csv",
+      defaultContactCount: 150,
+      specificSettingsTitle: "Feedback Survey & Escalation Thresholds",
+      specificSettingsDescription: "Define how low scores are escalated to human supervisors.",
+      specificField1Label: "Escalation Rating Threshold",
+      specificField1Type: "select",
+      specificField1Default: "Rating 2 or below",
+      specificField1Options: ["Rating 1 only", "Rating 2 or below", "Rating 3 or below"],
+      specificField2Label: "Post-Survey Data Destination",
+      specificField2Type: "select",
+      specificField2Default: "Google Sheets + CRM Webhook",
+      specificField2Options: ["Google Sheets + CRM Webhook", "Zendesk Support Tickets", "Freshdesk CRM", "Internal Webhook Only"],
+      specificToggleLabel: "Allow DTMF Keypad Rating (Press 1 to 5 on Dialpad)",
+      specificToggleDescription: "Enables customers in noisy environments to tap keypad numbers instead of speaking.",
+      specificToggleDefault: true,
+    },
   },
   {
     id: "template-marketing-ai",
+    typeKey: "marketing-ai",
     name: "Marketing AI",
     category: "Marketing & Outreach",
     tagline: "Promotional discount broadcasts, event invites & lead generation",
     description:
-      "Energetic, respectful outbound voice agent for flash sales, festive discount promotions, webinar registrations, and high-conversion commercial announcements.",
+      "High-energy outbound voice campaign agent for festive sales, webinar registrations, product launches, and discount voucher delivery via WhatsApp.",
     iconName: "Megaphone",
     accentColor: "#F59E0B",
-    badge: "High Conversion",
+    badge: "Contact Upload Ready",
     badgeVariant: "warning",
     targetAudience: "Retail, D2C Brands, EdTech, Real Estate & SaaS Product Launches",
-    recommendedFor: "Broadcasting limited-time promotional offers with instant WhatsApp coupon link dispatch while staying fully TRAI & DND compliant.",
+    recommendedFor: "Broadcasting limited-time promotional offers with bulk contact list uploads, instant WhatsApp coupon link dispatch, and TRAI DND scrubbing.",
     defaultDirection: "Outbound",
     businessUseCase: "Targeted Promotional Broadcast & Instant WhatsApp Voucher Dispatch",
     llmProvider: "Google Gemini",
@@ -185,7 +262,7 @@ Always keep calls under 90 seconds.`,
     speakingSpeed: 1.02,
     interruptionSensitivity: "High",
     greetingMessage:
-      "Namaste! Main Zenviah Retail se Meera bol rahi hoon. Diwali festive sale mein aapke liye special 30% discount voucher unlock hua hai. Kya main offer link aapke WhatsApp par share karoon?",
+      "Namaste! Main Zenviah Retail se Meera bol rahi hoon. Festive sale mein aapke liye special 30% discount voucher unlock hua hai. Kya main offer link aapke WhatsApp par share karoon?",
     systemPrompt: `You are Meera, a high-converting promotional voice concierge at Zenviah.ai.
 Introduce the limited-time discount or exclusive offer with high energy and utmost respect.
 Clearly articulate the benefit: 30% off on all collections valid till this Sunday.
@@ -198,30 +275,50 @@ Strictly adhere to TRAI calling hours (09:00 - 19:30 IST) and DND guidelines.`,
     sampleAudioQuote:
       "Namaste! Aapka special 30% discount coupon code aapke WhatsApp number par deliver ho gaya hai. Happy festive shopping!",
     keyHighlights: [
+      "Bulk CSV / Excel leads upload with automated DND scrubbing",
       "One-click WhatsApp voucher / brochure webhook dispatch",
       "Strict TRAI commercial calling window enforcement (09:00 - 19:30 IST)",
-      "Automatic DND registry scrubbing via Exotel / Airtel IQ",
-      "Real-time opt-in tracking & conversion rate analytics",
+      "Real-time opt-in tracking & conversion rate telemetry",
     ],
     extractedFields: ["interest_level", "whatsapp_optin", "coupon_code_dispatched"],
-    workflowSteps: ["Outbound Call", "Value Pitch", "Opt-in Check", "WhatsApp Webhook", "Conversion Tagging"],
+    workflowSteps: ["Upload Leads List", "TRAI DND Scrubbing", "Value Pitch Call", "WhatsApp Voucher Trigger", "Conversion Tagging"],
     estimatedSetupMinutes: 1,
     connectedIntegrations: ["int-exotel", "int-hubspot", "int-zapier"],
+    specificConfig: {
+      requiresContactsUpload: true,
+      contactsUploadDescription: "Upload your target customer list (CSV/Excel) with fields: Phone, Customer Name, and Custom Promo Tag.",
+      sampleContactsFile: "promotional_leads_sample.csv",
+      defaultContactCount: 500,
+      specificSettingsTitle: "Promotional Offer & Regulatory Guardrails",
+      specificSettingsDescription: "Configure your discount hook, WhatsApp voucher link, and TRAI calling hours.",
+      specificField1Label: "Voucher / Promo Code",
+      specificField1Type: "text",
+      specificField1Default: "FESTIVE30",
+      specificField1Placeholder: "e.g., FESTIVE30 or WELCOME20",
+      specificField2Label: "Maximum Outbound Concurrency (Parallel Calls)",
+      specificField2Type: "select",
+      specificField2Default: "25 Concurrent Channels",
+      specificField2Options: ["10 Concurrent Channels", "25 Concurrent Channels", "50 Concurrent Channels", "100 Concurrent Channels"],
+      specificToggleLabel: "Enforce TRAI 09:00 - 19:30 IST Calling Window",
+      specificToggleDescription: "Automatically pauses outbound dialer outside official Indian commercial calling hours.",
+      specificToggleDefault: true,
+    },
   },
   {
     id: "template-followup-ai",
+    typeKey: "followup-ai",
     name: "Followup AI",
     category: "Nurturing & Follow-up",
     tagline: "Smart lead nurturing, abandoned quote callbacks & renewal reminders",
     description:
-      "Attentive and polite conversational advisor that follows up on unfinished website checkouts, unaccepted proposal quotes, and upcoming policy or EMI renewals.",
+      "Consultative outbound voice agent that calls qualified leads, demo attendees, abandoned cart customers, and expiring policy holders with personalized context.",
     iconName: "PhoneForwarded",
     accentColor: "#8B7CFF",
-    badge: "Revenue Driver",
+    badge: "Contact Upload Ready",
     badgeVariant: "default",
     targetAudience: "FinTech, Insurance, B2B SaaS, Automotive & Real Estate",
-    recommendedFor: "Re-engaging warm prospects who reviewed pricing, answering common objections, and scheduling callbacks with senior sales reps.",
-    defaultDirection: "Both",
+    recommendedFor: "Re-engaging warm prospects with bulk CSV contact lists, consultative objection clearing, payment link delivery, and sales rep transfer.",
+    defaultDirection: "Outbound",
     businessUseCase: "Automated Quote Followup & Seamless Callback Scheduling",
     llmProvider: "Anthropic",
     model: "claude-3-5-sonnet",
@@ -237,7 +334,7 @@ Strictly adhere to TRAI calling hours (09:00 - 19:30 IST) and DND guidelines.`,
     speakingSpeed: 1.0,
     interruptionSensitivity: "Medium",
     greetingMessage:
-      "Hello! This is Kavya calling from Zenviah Financial Solutions regarding the proposal quote you reviewed yesterday. Do you have two minutes to check if you had any questions regarding the coverage?",
+      "Hello! This is Kavya calling from Zenviah Solutions regarding the quote you reviewed yesterday. Do you have two minutes to check if you had any questions regarding the coverage terms?",
     systemPrompt: `You are Kavya, an attentive and professional follow-up advisor at Zenviah.ai.
 You are contacting leads who requested a proposal or quote recently.
 Inquire if they have reviewed the document and if any questions remain regarding terms, pricing, or onboarding timelines.
@@ -250,23 +347,43 @@ Always maintain an empathetic, consultative tone.`,
     sampleAudioQuote:
       "Thank you! I've scheduled a quick 10-minute walkthrough with our senior advisor for tomorrow at 4 PM IST. Have a great day!",
     keyHighlights: [
-      "Consultative objection handling tailored for high-ticket quotes",
-      "Integrated callback scheduler with timezone intelligence",
+      "Bulk CSV / Excel qualified lead list upload supported",
+      "Contextual objection handling tailored for high-ticket quotes",
       "Instant Razorpay / UPI payment link dispatch mid-call",
-      "CRM deal stage auto-update in Salesforce, Zoho & HubSpot",
+      "Direct transfer to human sales executive if high intent detected",
     ],
     extractedFields: ["proposal_status", "blocker_notes", "scheduled_callback", "payment_link_sent"],
-    workflowSteps: ["Context Reference", "Objection Handling", "Action Offer", "Schedule Callback / Pay", "CRM Update"],
+    workflowSteps: ["Upload Warm Leads", "Contextual Recall", "Objection Handling", "Send Payment Link / Transfer", "CRM Deal Update"],
     estimatedSetupMinutes: 1,
     connectedIntegrations: ["int-exotel", "int-salesforce", "int-n8n"],
+    specificConfig: {
+      requiresContactsUpload: true,
+      contactsUploadDescription: "Upload a CSV/Excel list containing Lead Name, Phone, Quote Amount, and Last Interaction Date.",
+      sampleContactsFile: "abandoned_quotes_sample.csv",
+      defaultContactCount: 85,
+      specificSettingsTitle: "Follow-Up Context & Human Handoff",
+      specificSettingsDescription: "Configure sales escalation triggers and payment link integrations.",
+      specificField1Label: "Human Sales Transfer Phone (+91)",
+      specificField1Type: "text",
+      specificField1Default: "+91 98400 12345",
+      specificField1Placeholder: "+91 98400 12345",
+      specificField2Label: "Payment Gateway Connector",
+      specificField2Type: "select",
+      specificField2Default: "Razorpay Payment Links",
+      specificField2Options: ["Razorpay Payment Links", "Cashfree Payments", "Stripe Invoice", "Custom UPI Webhook"],
+      specificToggleLabel: "Warm Transfer to Live Rep on High Buying Intent",
+      specificToggleDescription: "Instantly bridges call to your designated sales executive if prospect asks to finalize purchase.",
+      specificToggleDefault: true,
+    },
   },
   {
     id: "template-custom-config",
+    typeKey: "custom-config",
     name: "Custom Config",
     category: "Custom Engineering",
-    tagline: "Build a blank-slate agent with custom prompt, tools & workflows",
+    tagline: "Build a bespoke agent with custom prompt, tools & workflows",
     description:
-      "Start with a customizable baseline template or dive into the full 6-Step Agent Wizard and visual React Flow builder for bespoke multi-turn enterprise logic.",
+      "Start with a flexible baseline template or open the full 6-Step Agent Wizard and visual React Flow builder for bespoke multi-turn enterprise logic.",
     iconName: "SlidersHorizontal",
     accentColor: "#111318",
     badge: "Full Flexibility",
@@ -297,15 +414,30 @@ Follow your enterprise business guidelines, reference attached knowledge bases, 
     sampleAudioQuote:
       "Hello! Your custom voice pipeline is initialized and ready to process real-time voice streaming.",
     keyHighlights: [
+      "Optional contacts: Choose between Inbound, Outbound, or Both",
       "Full flexibility across all 5 LLM providers & 5 neural TTS engines",
-      "Visual node-based routing in the React Flow Workflow Builder",
-      "Custom JSON mid-call HTTP REST API webhooks",
-      "Connect custom Knowledge Base RAG documents",
+      "Direct deep-link to 6-Step Agent Wizard and Visual Workflow editor",
+      "Custom REST webhooks and external database grounding",
     ],
-    extractedFields: ["custom_var_1", "custom_var_2"],
-    workflowSteps: ["Custom Trigger", "Prompt LLM", "Tool Call", "Branch", "End Session"],
+    extractedFields: ["custom_field_1", "custom_field_2", "conversation_summary"],
+    workflowSteps: ["Call Inbound / Outbound", "Custom Prompt Reasoning", "External REST API Tool", "Conditional Branching", "Final Handoff"],
     estimatedSetupMinutes: 2,
-    connectedIntegrations: ["int-exotel", "int-hubspot"],
+    connectedIntegrations: ["int-exotel", "int-n8n"],
+    specificConfig: {
+      requiresContactsUpload: false,
+      specificSettingsTitle: "Custom Architecture & Advanced Tools",
+      specificSettingsDescription: "Configure low-latency parameters, temperature, and advanced tool calling.",
+      specificField1Label: "Primary Business Domain",
+      specificField1Type: "text",
+      specificField1Default: "Enterprise Telephony & Support",
+      specificField1Placeholder: "e.g., Banking, Logistics, SaaS, Healthcare",
+      specificField2Label: "LLM Reasoning Temperature (Creativity)",
+      specificField2Type: "select",
+      specificField2Default: "0.3 (Strict & Deterministic)",
+      specificField2Options: ["0.1 (Strict & Precise)", "0.3 (Strict & Deterministic)", "0.6 (Balanced & Conversational)", "0.8 (Creative)"],
+      specificToggleLabel: "Enable Custom Webhook & External API Tool Calling",
+      specificToggleDescription: "Allows this agent to query your backend microservices mid-call to fetch live account records.",
+      specificToggleDefault: true,
+    },
   },
 ];
-
